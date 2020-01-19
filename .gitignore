@@ -1,0 +1,5 @@
+/output-virtualbox-iso
+/output-vmware-iso
+/test-vm
+*.box
+*.vmx
