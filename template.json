@@ -1,0 +1,132 @@
+{
+    "_comment": "My condolences for all the copy-pasting in this file..",
+    
+    "variables": {
+        "cpus": "2",
+        "memory_mb": "4096",
+        "vbox_videomem_mb": "256",
+        "vmware_videomem_kb": "786432"
+    },
+    
+    "builders": [{
+        "type": "virtualbox-iso",
+        "guest_os_type": "Ubuntu_64",
+        "iso_url": "http://cdimage.ubuntu.com/ubuntu-budgie/releases/19.10/release/ubuntu-budgie-19.10-desktop-amd64.iso",
+        "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu-budgie/releases/19.10/release/MD5SUMS",
+        "iso_checksum_type": "md5",
+        "vboxmanage": [
+            ["modifyvm", "{{.Name}}",
+             "--cpus", "{{user `cpus`}}",
+             "--memory", "{{user `memory_mb`}}",
+             "--vram", "{{user `vbox_videomem_mb`}}",
+             "--audioout", "on",
+             "--accelerate3d", "on"]
+        ],
+        "boot_wait": "1m30s",
+        "boot_command": [
+            "<tab><wait1s><tab><wait1s><tab><wait1s><enter><wait15s>",
+            
+            "<tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter><wait10s>",
+            "<down><wait1s><tab><wait1s><spacebar><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter>",
+            
+            "<wait1m10s>",
+            
+            "<tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter><wait10s>",
+            "<tab><wait1s><enter><wait30s>",
+            "<tab><wait2s>New York<wait5s><tab><wait2s><tab><wait2s><tab><wait2s><enter><wait20s>",
+            "Vagrant<tab><wait1s>ubuntu-budgie-19<tab><wait1s><tab><wait1s>vagrant<tab><wait1s>vagrant<tab><wait1s><up><wait1s><tab><wait1s><enter>",
+            
+            "<wait15m>",
+            
+            "<enter>",
+            
+            "<wait25s>",
+            
+            "<enter>",
+            
+            "<wait4m>",
+            
+            "<leftCtrlOn><leftAltOn>t<leftAltOff><leftCtrlOff><wait10s>",
+            
+            "echo 'vagrant' | sudo -S apt-get install -y openssh-server && exit<enter>",
+            
+            "<wait1m>"
+        ],
+        "ssh_timeout": "4m",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now"
+    },{
+        "type": "vmware-iso",
+        "version": "16",
+        "guest_os_type": "ubuntu-64",
+        "iso_url": "http://cdimage.ubuntu.com/ubuntu-budgie/releases/19.10/release/ubuntu-budgie-19.10-desktop-amd64.iso",
+        "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu-budgie/releases/19.10/release/MD5SUMS",
+        "iso_checksum_type": "md5",
+        "disk_adapter_type": "nvme",
+        "disk_type_id": "0",
+        "vmx_remove_ethernet_interfaces": true,
+        "sound": true,
+        "cpus": "{{user `cpus`}}",
+        "memory": "{{user `memory_mb`}}",
+        "vmx_data": {
+            "svga.graphicsMemoryKB": "{{user `vmware_videomem_kb`}}",
+            "mks.enable3d": "TRUE"
+        },
+        "boot_wait": "1m",
+        "boot_command": [
+            "<tab><wait1s><tab><wait1s><enter><wait15s>",
+            
+            "<tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter><wait10s>",
+            "<down><wait1s><tab><wait1s><spacebar><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter>",
+            
+            "<wait1m10s>",
+            
+            "<tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><tab><wait1s><enter><wait10s>",
+            "<tab><wait1s><enter><wait30s>",
+            "<tab><wait2s>New York<wait5s><tab><wait2s><tab><wait2s><tab><wait2s><enter><wait20s>",
+            "Vagrant<tab><wait1s>ubuntu-budgie-19<tab><wait1s><tab><wait1s>vagrant<tab><wait1s>vagrant<tab><wait1s><up><wait1s><tab><wait1s><enter>",
+            
+            "<wait7m>",
+            
+            "<enter>",
+            
+            "<wait20s>",
+            
+            "<enter>",
+            
+            "<wait2m>",
+            
+            "<leftCtrlOn><leftAltOn>t<leftAltOff><leftCtrlOff><wait10s>",
+            
+            "echo 'vagrant' | sudo -S apt-get install -y openssh-server && exit<enter>"
+        ],
+        "tools_upload_flavor": "linux",
+        "ssh_timeout": "5m",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now" }],
+    
+    "provisioners": [{
+        "type": "shell",
+        "only": ["virtualbox-iso"],
+        "script": "vbox/provision.sh",
+        "execute_command": "echo 'vagrant' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'" },{
+        
+        "type": "shell",
+        "only": ["vmware-iso"],
+        "script": "vmware/provision.sh",
+        "execute_command": "echo 'vagrant' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'" },{
+        
+        "type": "shell",
+        "script": "provision.sh",
+        "execute_command": "echo 'vagrant' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'" }],
+    
+    "post-processors": [{
+        "type": "vagrant",
+        "override": {
+            "virtualbox": {"vagrantfile_template": "vbox/Vagrantfile"},
+            "vmware":     {"vagrantfile_template": "vmware/Vagrantfile"}
+        }
+    }]
+}
