@@ -20,6 +20,7 @@
              "--memory", "{{user `memory_mb`}}",
              "--vram", "{{user `vbox_videomem_mb`}}",
              "--audioout", "on",
+             "--graphicscontroller", "vmsvga",
              "--accelerate3d", "on"]
         ],
         "boot_wait": "1m30s",

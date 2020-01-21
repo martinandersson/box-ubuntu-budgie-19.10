@@ -20,9 +20,12 @@ components are documented below.
 [changelog-1]: http://keepachangelog.com/en/1.0.0/
 [changelog-2]: http://semver.org/spec/v2.0.0.html
 
-## Unreleased
+## [Unreleased][unreleased-1]
 
-- Nothing, yet.
+- VirtualBox: Proper 3D acceleration ([issue #2][unreleased-2])
+
+[unreleased-1]: https://github.com/martinanderssondotcom/box-ubuntu-budgie-19.10/compare/v1.0.0...HEAD
+[unreleased-2]: https://github.com/martinanderssondotcom/box-ubuntu-budgie-19.10/issues/2
 
 ## 1.0.0 - 2020-01-19
 
